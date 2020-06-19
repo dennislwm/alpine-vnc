@@ -2,7 +2,10 @@
 # includes xfce, vnc, ssh
 # last update: aug/26/2019
 
-FROM alpine:3.10
+#
+# alpine with glibc (for conda)
+# source frolvlad/alpine-glibc:alpine-3.11
+FROM frolvlad/alpine-glibc:alpine-3.11
 
 # init ash file (for non-login shells)
 ENV ENV '$HOME/.ashrc'
@@ -11,8 +14,8 @@ ENV ENV '$HOME/.ashrc'
 ENV XRES 1280x800x24
 
 # tzdata settings
-ENV TZ_AREA America
-ENV TZ_CITY Mexico_City
+ENV TZ_AREA Australia
+ENV TZ_CITY Sydney
 
 # update and install system software
 RUN apk update \
@@ -23,7 +26,7 @@ RUN apk update \
 	&& apk add xvfb x11vnc \
 	#
 	# xfce4 and gui goodies
-	xfce4-xkb-plugin xscreensaver leafpad \
+	xfce4-xkb-plugin xscreensaver leafpad geany \
 	#
 	# set up timezone
 	tzdata \
@@ -40,9 +43,9 @@ RUN sed -i  's/adduser -h/adduser -D -h/' /sbin/setup-box \
 # change root passwd and add users and groups 
 # (user alpine alredy added by setup-box)
 RUN	echo "root:alpine" | /usr/sbin/chpasswd \
-#   && adduser -D alpine -s /bin/bash \
-    && echo "alpine:alpine" | /usr/sbin/chpasswd \
-    && echo "alpine    ALL=(ALL) ALL" >> /etc/sudoers 	
+	#   && adduser -D alpine -s /bin/bash \
+	&& echo "alpine:alpine" | /usr/sbin/chpasswd \
+	&& echo "alpine    ALL=(ALL) ALL" >> /etc/sudoers 	
 
 # setup sshd
 RUN mkdir /run/sshd \
